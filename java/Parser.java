@@ -1,6 +1,8 @@
 // To generate callgraph: opt -print-callgraph <.bc file here> 2>&1 1> /dev/null
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -58,13 +60,11 @@ class Parser {
 		for(String key : callgraph.keySet()) {
 			Set<String> st = new HashSet<String>();
 			st.add(key);
-			Integer num = support(st);
-			onesupport.put(key, num);
-			System.out.println("{" + key + "}: " + num);
+			onesupport.put(key, support(st));
 		}
 
 		// Debugging viewer of function
-		System.out.println("Root: " + root);
+		/*System.out.println("Root: " + root);
 		for (Map.Entry<String, Set<String>> entry : callgraph.entrySet()) {
 			String key = entry.getKey();
 			Set<String> value = entry.getValue();
@@ -74,7 +74,17 @@ class Parser {
 			while (iterator.hasNext()){
 				System.out.println("Entry: " + iterator.next());
 			}
-		}
+		}	// */
 
+		// Generate all pairs
+		List<String> keylist = new ArrayList<String>(callgraph.keySet());
+		for(int i = 0; i < keylist.size(); i++) {
+			for(int j = i+1; j < keylist.size(); j++) {
+				Set<String> cmpset = new HashSet<String>();
+				cmpset.add(keylist.get(i));
+				cmpset.add(keylist.get(j));
+				System.out.println("{" + keylist.get(i) + "," + keylist.get(j) + "}: " + support(cmpset));
+			}
+		}
 	}
 }
