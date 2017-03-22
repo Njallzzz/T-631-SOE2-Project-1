@@ -1,18 +1,18 @@
 // To generate callgraph: opt -print-callgraph <.bc file here> 2>&1 1> /dev/null
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.io.*;
 
 class Parser {
 	private static String root;
-	private static Map<String, List<String>> callgraph;
+	private static Map<String, Set<String>> callgraph;
 
 	public static void main (String [] args) throws java.io.IOException {
 		// Initialize data structures used for storage
-		callgraph = new HashMap<String, List<String>>();
+		callgraph = new HashMap<String, Set<String>>();
 
 		// Redirect stdin to BufferedReader
 		InputStreamReader instream = new InputStreamReader(System.in);
@@ -20,7 +20,7 @@ class Parser {
 
 		// While loop variables
 		String line = null, nodeName = null;
-		List<String> currNode = null;
+		Set<String> currNode = null;
 
 		// Parser main while loop
 		while((line = buffer.readLine()) != null) {
@@ -31,7 +31,7 @@ class Parser {
 			} else if( line.contains("Root is:") ) {
 				root = line.substring(19);
 			} else if(line.contains("node for f")) {
-				currNode = new ArrayList<String>();
+				currNode = new HashSet<String>();
 				line = line.substring(31);
 				nodeName = line.substring(0, line.indexOf('\''));
 			} else if(line.contains("calls function")) {
@@ -44,12 +44,14 @@ class Parser {
 
 		// Debugging viewer of function
 		System.out.println("Root: " + root);
-		for (Map.Entry<String, List<String>> entry : callgraph.entrySet()) {
+		for (Map.Entry<String, Set<String>> entry : callgraph.entrySet()) {
 			String key = entry.getKey();
-			List<String> value = entry.getValue();
+			Set<String> value = entry.getValue();
 			System.out.println("\nKey: " + key);
-			for(int i = 0; i < value.size(); i++) {
-				System.out.println("Entry: " + value.get(i));
+
+			Iterator iterator = value.iterator();      
+			while (iterator.hasNext()){
+				System.out.println("Entry: " + iterator.next());
 			}
 		}
 	}
