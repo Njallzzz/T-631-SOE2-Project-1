@@ -5,9 +5,11 @@ import java.util.List;
 import java.io.*;
 
 class Parser {
+	private static String root;
 	private static Map<String, List<String>> callgraph;
 
 	public static void main (String [] args) throws java.io.IOException {
+		root = new String();
 		callgraph = new HashMap<String, List<String>>();
 
 		InputStreamReader instream = new InputStreamReader(System.in);
@@ -17,11 +19,15 @@ class Parser {
 		String line;	
 
 		while((line = buffer.readLine()) != null) {
+			if( line.contains("CallGraph Root is:") )
+				root = line.substring(19);
+
 			length = length + line.length();
 
 			System.out.println(line);
 		}
 
+		System.out.println("root: " + root);
 		System.out.println("Length: " + length);
 	}
 }
