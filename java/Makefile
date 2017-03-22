@@ -8,11 +8,11 @@ all: $(CLASSES)
 clean:
 	$(RM) *.class
 
-runtest1:
+test1:
 	java -classpath . Parser < callgraph_test1
 
-runtest2:
+test2:
 	java -classpath . Parser < callgraph_test2
 
-runtest3:
+test3:
 	java -classpath . Parser < callgraph_test3
