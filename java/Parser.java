@@ -9,6 +9,7 @@ import java.io.*;
 class Parser {
 	private static String root;
 	private static Map<String, Set<String>> callgraph;
+	private static Map<String, Integer> onesupport;
 
 	private static int support(Set<String> hset) {
 		int num = 0;
@@ -23,6 +24,7 @@ class Parser {
 	public static void main (String [] args) throws java.io.IOException {
 		// Initialize data structures used for storage
 		callgraph = new HashMap<String, Set<String>>();
+		onesupport = new HashMap<String, Integer>();
 
 		// Redirect stdin to BufferedReader
 		InputStreamReader instream = new InputStreamReader(System.in);
@@ -52,6 +54,15 @@ class Parser {
 			}
 		}
 
+		// Generate support for individual functions
+		for(String key : callgraph.keySet()) {
+			Set<String> st = new HashSet<String>();
+			st.add(key);
+			Integer num = support(st);
+			onesupport.put(key, num);
+			System.out.println("{" + key + "}: " + num);
+		}
+
 		// Debugging viewer of function
 		System.out.println("Root: " + root);
 		for (Map.Entry<String, Set<String>> entry : callgraph.entrySet()) {
@@ -64,15 +75,6 @@ class Parser {
 				System.out.println("Entry: " + iterator.next());
 			}
 		}
-
-		Set<String> cmp = new HashSet<String>();
-	    cmp.add("A");
-		cmp.add("B");	
-
-		Set<String> cmp1 = new HashSet<String>();
-		cmp1.add("B");	
-
-		System.out.println("{A,B}, A: " + support(cmp) + " " + support(cmp1) );
 
 	}
 }
