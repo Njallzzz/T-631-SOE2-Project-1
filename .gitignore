@@ -1,3 +1,14 @@
+# Compiled class files
+*.class
+
+# Log file
+*.log
+
+# Package files
+*.jar
+*.war
+*.ear
+
 pipair
 *.bc
 .bash_history
