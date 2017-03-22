@@ -12,7 +12,10 @@ class Parser {
 
 		InputStreamReader instream = new InputStreamReader(System.in);
 		BufferedReader buffer = new BufferedReader(instream);
-	
+
+		int length = 0;
+		String line;	
+
 		line = buffer.readLine();
 
 		while (line!=null){
