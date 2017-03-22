@@ -20,7 +20,7 @@ class Parser {
 
 		// While loop variables
 		String line = null, nodeName = null;
-		List currNode = null;
+		List<String> currNode = null;
 
 		// Parser main while loop
 		while((line = buffer.readLine()) != null) {
@@ -32,7 +32,8 @@ class Parser {
 				root = line.substring(19);
 			} else if(line.contains("Call graph node for function:")) {
 				currNode = new ArrayList<String>();
-				nodeName = line.substring(31, line.indexOf('\''));
+				line = line.substring(31);
+				nodeName = line.substring(0, line.indexOf('\''));
 			} else if(line.contains(" calls function ")) {
 				if(currNode != null) {
 					line = line.substring(line.indexOf('\'')+1, line.length()-1);
