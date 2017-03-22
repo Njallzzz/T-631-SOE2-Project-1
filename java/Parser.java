@@ -10,6 +10,16 @@ class Parser {
 	private static String root;
 	private static Map<String, Set<String>> callgraph;
 
+	private static int support(Set<String> hset) {
+		int num = 0;
+		for (Map.Entry<String, Set<String>> entry : callgraph.entrySet()) {
+			if(entry.getValue().containsAll(hset)) {
+				num++;
+			}
+		}
+		return num;
+	}
+
 	public static void main (String [] args) throws java.io.IOException {
 		// Initialize data structures used for storage
 		callgraph = new HashMap<String, Set<String>>();
@@ -54,5 +64,15 @@ class Parser {
 				System.out.println("Entry: " + iterator.next());
 			}
 		}
+
+		Set<String> cmp = new HashSet<String>();
+	    cmp.add("A");
+		cmp.add("B");	
+
+		Set<String> cmp1 = new HashSet<String>();
+		cmp1.add("B");	
+
+		System.out.println("{A,B}, A: " + support(cmp) + " " + support(cmp1) );
+
 	}
 }
