@@ -9,6 +9,9 @@
 *.war
 *.ear
 
+# Oracle folder (wtf)
+.oracle_jre_usage
+
 pipair
 *.bc
 .bash_history
