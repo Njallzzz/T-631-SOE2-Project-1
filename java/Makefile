@@ -3,7 +3,7 @@ CLASSES = \
 	Parser.java \
 
 all: $(CLASSES)
-	$(JC) $(CLASSES)
+	$(JC) -Xlint:unchecked $(CLASSES)
 
 clean:
 	$(RM) *.class
