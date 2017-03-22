@@ -16,11 +16,12 @@ class Parser {
 		int length = 0;
 		String line;	
 
-		line = buffer.readLine();
-
-		while (line!=null){
+		while((line = buffer.readLine()) != null) {
 			length = length + line.length();
-			line= buffer.readLine();
+
+			System.out.println(line);
 		}
+
+		System.out.println("Length: " + length);
 	}
 }
