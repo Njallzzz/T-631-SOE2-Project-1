@@ -57,17 +57,5 @@ class Parser {
 			}
 		}
 
-		/*Iterator it = callgraph.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry pair = (Map.Entry)it.next();
-			System.out.println(pair.getKey() + " = ");
-			ArrayList lis = pair.getValue();
-			for(int i = 0; i < lis.size(); i++) {
-				System.out.println("entry: " + lis.get(i));
-			}
-
-			it.remove(); // avoids a ConcurrentModificationException
-		}	// */
-
 	}
 }
