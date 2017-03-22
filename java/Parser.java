@@ -28,13 +28,13 @@ class Parser {
 				if( currNode != null || nodeName != null ) { 
 					callgraph.put(nodeName, currNode); 
 				}
-			} else if( line.contains("CallGraph Root is:") ) {
+			} else if( line.contains("Root is:") ) {
 				root = line.substring(19);
-			} else if(line.contains("Call graph node for function:")) {
+			} else if(line.contains("node for f")) {
 				currNode = new ArrayList<String>();
 				line = line.substring(31);
 				nodeName = line.substring(0, line.indexOf('\''));
-			} else if(line.contains(" calls function ")) {
+			} else if(line.contains("calls function")) {
 				if(currNode != null) {
 					line = line.substring(line.indexOf('\'')+1, line.length()-1);
 					currNode.add(line);
@@ -43,6 +43,7 @@ class Parser {
 		}
 
 		// Debugging viewer of function
+		System.out.println("Root: " + root);
 		for (Map.Entry<String, List<String>> entry : callgraph.entrySet()) {
 			String key = entry.getKey();
 			List<String> value = entry.getValue();
