@@ -9,14 +9,16 @@ class Parser {
 	private static Map<String, List<String>> callgraph;
 
 	public static void main (String [] args) throws java.io.IOException {
-		root = new String();
+		// Initialize data structures used for storage
 		callgraph = new HashMap<String, List<String>>();
 
+		// Redirect stdin to BufferedReader
 		InputStreamReader instream = new InputStreamReader(System.in);
 		BufferedReader buffer = new BufferedReader(instream);
 
+		// While loop variables
 		int length = 0;
-		String line;	
+		String line;
 
 		while((line = buffer.readLine()) != null) {
 			if( line.contains("CallGraph Root is:") )
