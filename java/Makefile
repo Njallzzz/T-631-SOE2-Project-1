@@ -1,6 +1,8 @@
 JC = javac
 CLASSES = \
 	Parser.java \
+	FuncPair.java \
+	CallGraph.java \
 
 all: $(CLASSES)
 	$(JC) -Xlint:unchecked $(CLASSES)
