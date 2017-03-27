@@ -11,8 +11,18 @@ class FuncPair {
   }
 
   public FuncPair(String first, String second) {
-    this.first = first;
-    this.second = second;
+    // Pairs need to be sorted lexicographically according to project PDF
+    if (first.compareTo(second) <= 0) {
+      this.first = first;
+      this.second = second;
+    } else {
+      this.first = second;
+      this.second = first;
+    }
+  }
+
+  public Boolean contains(String func) {
+    return first.equals(func) || second.equals(func);
   }
 
   @Override
@@ -31,7 +41,7 @@ class FuncPair {
 
   @Override
   public String toString() {
-    return first + ":" + second;
+    return "(" + first + ", " + second + ")";
   }
 
   public static void main (String [] args) {

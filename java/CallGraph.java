@@ -9,6 +9,8 @@ import java.lang.StringBuilder;
 
 class CallGraph {
   Map<String, Map<String, Boolean>> graph;
+  Map<FuncPair, Integer> pairSupport;
+  Map<String, Integer> funcSupport;
 
   public CallGraph() {
     graph = new HashMap<String, Map<String, Boolean>>();
@@ -24,17 +26,7 @@ class CallGraph {
     calls.put(callee, true);
   }
 
-  public Set<String> getCallees() {
-    Set<String> nodes = new HashSet<String>();
-
-    for (Map.Entry<String, Map<String, Boolean>> entry : graph.entrySet()) {
-      Map<String, Boolean> callees = entry.getValue();
-      nodes.addAll(callees.keySet());
-    }
-
-    return nodes;
-  }
-
+  // Returns true if caller calls the callee, false otherwise
   public Boolean calls(String caller, String callee) {
     if (!graph.containsKey(caller)) {
       return false;
@@ -49,6 +41,77 @@ class CallGraph {
     return callees.get(callee);
   }
 
+  // Returns a set of all callers (essentially each scope)
+  public Set<String> getCallers() {
+    return graph.keySet();
+  }
+
+  public Set<String> getCallersContaining(String callee) {
+    Set<String> result = new HashSet<>();
+
+    for (String caller : getCallers()) {
+      Set<String> callees = getCalleesFor(caller);
+      if (callees.contains(callee)) result.add(caller);
+    }
+    return result;
+  }
+
+  // Returns a set of all callees
+  public Set<String> getCallees() {
+    Set<String> nodes = new HashSet<String>();
+
+    for (Map.Entry<String, Map<String, Boolean>> entry : graph.entrySet()) {
+      Map<String, Boolean> callees = entry.getValue();
+      nodes.addAll(callees.keySet());
+    }
+
+    return nodes;
+  }
+
+  // Gets all functions the given caller calls.
+  public Set<String> getCalleesFor(String caller) {
+    if (!graph.containsKey(caller)) return null;
+
+    Map<String, Boolean> callees = graph.get(caller);
+    return callees.keySet();
+  }
+
+  // Can we memoize this so lookups are faster?
+  public Set<FuncPair> getPairsContaining(String func) {
+    if (pairSupport == null) return null;
+
+    Set<FuncPair> allPairs = pairSupport.keySet();
+    Set<FuncPair> containingPairs = new HashSet<>();
+
+    for (FuncPair pair : allPairs) {
+      if (pair.contains(func)) containingPairs.add(pair);
+    }
+
+    return containingPairs;
+  }
+
+  // Will get all pairs in a given scope (the caller).
+  // Returns null if the caller does not exist.
+  public Set<FuncPair> getPairsFor(String caller) {
+    if (!graph.containsKey(caller)) return null;
+    Set<FuncPair> pairs = new HashSet<FuncPair>();
+
+    Map<String, Boolean> callees = graph.get(caller);
+    List<String> calleeList = new ArrayList<>(callees.keySet());
+
+    // Generate all the pairs
+    for (int i = 0; i < calleeList.size(); i++) {
+      for (int j = i+1; j < calleeList.size(); j++) {
+        pairs.add(new FuncPair(calleeList.get(i), calleeList.get(j)));
+      }
+    }
+
+    return pairs;
+  }
+
+  // Calculates how many times a pair of functions appear together.
+  // Pairs appearing more than one time in a single scope (a single
+  // caller calls the pair multiple times) will be counted only once.
   public int support(String f1, String f2) {
     int result = 0;
     for(Map.Entry<String, Map<String, Boolean>> entry : graph.entrySet()) {
@@ -60,6 +123,9 @@ class CallGraph {
     return result;
   }
 
+  // Calculates in how many scopes a function is called.
+  // A function that is called multiple times in a single scope
+  // is only counted once.
   public int support(String func) {
     int result = 0;
     for(Map.Entry<String, Map<String, Boolean>> entry : graph.entrySet()) {
@@ -68,6 +134,48 @@ class CallGraph {
         result++;
       }
     }
+    return result;
+  }
+
+  // Calculates and memoizes the support for each pair of callees.
+  // We don't need to create pairs from callers if they are not
+  // callees themselves.
+  public Map<FuncPair, Integer> allPairsSupport() {
+    if (this.pairSupport != null) {
+      return this.pairSupport;
+    }
+
+    Map<FuncPair, Integer> supportMap = new HashMap<>();
+
+    // Generate each pair of functions from our call graph callees and
+    // calculate the support of that pair.
+    List<String> callees = new ArrayList<>(this.getCallees());
+    for (int i = 0; i < callees.size(); i++) {
+      for (int j = i+1; j < callees.size(); j++) {
+        FuncPair pair = new FuncPair(callees.get(i), callees.get(j));
+        int support = this.support(pair.first, pair.second);
+        supportMap.put(pair, support);
+      }
+    }
+    this.pairSupport = supportMap;
+    return supportMap;
+  }
+
+  // Calculates and memoizes the support for each callee.
+  public Map<String, Integer> allFunctionsSupport() {
+    if (this.funcSupport != null) {
+      return this.funcSupport;
+    }
+
+    Map<String, Integer> supportMap = new HashMap<>();
+
+    for (String s : this.getCallees()) {
+      // Calculate the support of each callee and add it to our map
+      int support = this.support(s);
+      supportMap.put(s, support);
+    }
+    this.funcSupport = supportMap;
+    return supportMap;
   }
 
   @Override
