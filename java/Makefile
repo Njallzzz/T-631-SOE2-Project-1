@@ -4,6 +4,7 @@ CLASSES = \
 	Parser.java \
 	FuncPair.java \
 	CallGraph.java \
+	BugDetector.java\
 
 all: $(CLASSES)
 	$(JC) -Xlint:unchecked $(CLASSES)

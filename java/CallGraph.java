@@ -7,112 +7,68 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.lang.StringBuilder;
 
+// A call graph implemented as a directed adjacency matrix.
+// Terminology: Nodes and edges, as per any graph.
+// Caller: A node that has an edge pointing away from it toward a callee
+// Callee: A node that has an edge pointing into it from a caller
 class CallGraph {
   Map<String, Map<String, Boolean>> graph;
-  Map<FuncPair, Integer> pairSupport;
-  Map<String, Integer> funcSupport;
+  Set<String> nodes;
 
   public CallGraph() {
     graph = new HashMap<String, Map<String, Boolean>>();
+    nodes = new HashSet<String>();
   }
 
+  // Adds an edge between caller and callee, creating the nodes if they don't exist
   public void addEdge(String caller, String callee) {
     if (!graph.containsKey(caller)) {
       graph.put(caller, new HashMap<String, Boolean>());
+      nodes.add(caller);
     }
 
     Map<String, Boolean> calls = graph.get(caller);
 
     calls.put(callee, true);
+    nodes.add(callee);
   }
 
-  // Returns true if caller calls the callee, false otherwise
-  public Boolean calls(String caller, String callee) {
-    if (!graph.containsKey(caller)) {
+  // Returns true if there is an edge from node1 to node2, false otherwise
+  public Boolean hasEdge(String node1, String node2) {
+    if (!graph.containsKey(node1)) {
       return false;
     }
 
-    Map<String, Boolean> callees = graph.get(caller);
+    Map<String, Boolean> callees = graph.get(node1);
 
-    if (!callees.containsKey(callee)) {
+    if (!callees.containsKey(node2)) {
       return false;
     }
 
-    return callees.get(callee);
+    return callees.get(node2);
   }
 
-  // Returns a set of all callers (essentially each scope)
-  public Set<String> getCallers() {
-    return graph.keySet();
-  }
-
-  public Set<String> getCallersContaining(String callee) {
+  // Get a set of all nodes that have edges to callee
+  public Set<String> getCallersTo(String callee) {
     Set<String> result = new HashSet<>();
 
-    for (String caller : getCallers()) {
-      Set<String> callees = getCalleesFor(caller);
+    for (String caller : graph.keySet()) {
+      Set<String> callees = getCalleesFrom(caller);
       if (callees.contains(callee)) result.add(caller);
     }
     return result;
   }
 
-  // Returns a set of all callees
-  public Set<String> getCallees() {
-    Set<String> nodes = new HashSet<String>();
-
-    for (Map.Entry<String, Map<String, Boolean>> entry : graph.entrySet()) {
-      Map<String, Boolean> callees = entry.getValue();
-      nodes.addAll(callees.keySet());
-    }
-
-    return nodes;
-  }
-
-  // Gets all functions the given caller calls.
-  public Set<String> getCalleesFor(String caller) {
+  // Get a set of all nodes that caller has edges to
+  public Set<String> getCalleesFrom(String caller) {
     if (!graph.containsKey(caller)) return null;
 
     Map<String, Boolean> callees = graph.get(caller);
     return callees.keySet();
   }
 
-  // Can we memoize this so lookups are faster?
-  public Set<FuncPair> getPairsContaining(String func) {
-    if (pairSupport == null) return null;
-
-    Set<FuncPair> allPairs = pairSupport.keySet();
-    Set<FuncPair> containingPairs = new HashSet<>();
-
-    for (FuncPair pair : allPairs) {
-      if (pair.contains(func)) containingPairs.add(pair);
-    }
-
-    return containingPairs;
-  }
-
-  // Will get all pairs in a given scope (the caller).
-  // Returns null if the caller does not exist.
-  public Set<FuncPair> getPairsFor(String caller) {
-    if (!graph.containsKey(caller)) return null;
-    Set<FuncPair> pairs = new HashSet<FuncPair>();
-
-    Map<String, Boolean> callees = graph.get(caller);
-    List<String> calleeList = new ArrayList<>(callees.keySet());
-
-    // Generate all the pairs
-    for (int i = 0; i < calleeList.size(); i++) {
-      for (int j = i+1; j < calleeList.size(); j++) {
-        pairs.add(new FuncPair(calleeList.get(i), calleeList.get(j)));
-      }
-    }
-
-    return pairs;
-  }
-
-  // Calculates how many times a pair of functions appear together.
-  // Pairs appearing more than one time in a single scope (a single
-  // caller calls the pair multiple times) will be counted only once.
-  public int support(String f1, String f2) {
+  // Calculate how many times this pair of edges leaves the same node
+  public int edgePairs(String f1, String f2) {
     int result = 0;
     for(Map.Entry<String, Map<String, Boolean>> entry : graph.entrySet()) {
       Map<String, Boolean> callees = entry.getValue();
@@ -123,59 +79,21 @@ class CallGraph {
     return result;
   }
 
-  // Calculates in how many scopes a function is called.
-  // A function that is called multiple times in a single scope
-  // is only counted once.
-  public int support(String func) {
+  // Calculate how many edges go to the given node
+  public int edgesTo(String node) {
     int result = 0;
-    for(Map.Entry<String, Map<String, Boolean>> entry : graph.entrySet()) {
-      Map<String, Boolean> callees = entry.getValue();
-      if (callees.containsKey(func)) {
+    for(String caller : graph.keySet()) {
+      Map<String, Boolean> callees = graph.get(caller);
+      if (callees.containsKey(node)) {
         result++;
       }
     }
     return result;
   }
 
-  // Calculates and memoizes the support for each pair of callees.
-  // We don't need to create pairs from callers if they are not
-  // callees themselves.
-  public Map<FuncPair, Integer> allPairsSupport() {
-    if (this.pairSupport != null) {
-      return this.pairSupport;
-    }
-
-    Map<FuncPair, Integer> supportMap = new HashMap<>();
-
-    // Generate each pair of functions from our call graph callees and
-    // calculate the support of that pair.
-    List<String> callees = new ArrayList<>(this.getCallees());
-    for (int i = 0; i < callees.size(); i++) {
-      for (int j = i+1; j < callees.size(); j++) {
-        FuncPair pair = new FuncPair(callees.get(i), callees.get(j));
-        int support = this.support(pair.first, pair.second);
-        supportMap.put(pair, support);
-      }
-    }
-    this.pairSupport = supportMap;
-    return supportMap;
-  }
-
-  // Calculates and memoizes the support for each callee.
-  public Map<String, Integer> allFunctionsSupport() {
-    if (this.funcSupport != null) {
-      return this.funcSupport;
-    }
-
-    Map<String, Integer> supportMap = new HashMap<>();
-
-    for (String s : this.getCallees()) {
-      // Calculate the support of each callee and add it to our map
-      int support = this.support(s);
-      supportMap.put(s, support);
-    }
-    this.funcSupport = supportMap;
-    return supportMap;
+  // Returns a set of the names of all nodes in the graph
+  public Set<String> getNodes() {
+    return nodes;
   }
 
   @Override
@@ -232,10 +150,6 @@ class CallGraph {
     graph.addEdge("scope6", "D");
 
     System.out.println(graph);
-    System.out.println(graph.support("A", "C"));
-    System.out.println(graph.getCallees());
-    List<String> c = new ArrayList<>(graph.getCallees());
-    Collections.reverse(c);
-    System.out.println(c);
+    System.out.println(graph.edgePairs("A", "C"));
   }
 }
