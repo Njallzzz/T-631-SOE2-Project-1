@@ -48,6 +48,10 @@ class CallGraph {
     return callees.get(node2);
   }
 
+  public Boolean hasNode(String node) {
+    return nodes.contains(node);
+  }
+
   // Get a set of all nodes that have edges to callee
   public Set<String> getCallersTo(String callee) {
     Set<String> result = new HashSet<>();

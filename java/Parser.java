@@ -30,9 +30,13 @@ class Parser {
           // New caller node. Extract the caller name and start parsing the edges
           String caller = currentLine.split("'")[1];
           while ((currentLine = br.readLine()) != null) {
-            if (!currentLine.trim().startsWith("CS") || currentLine.contains("external")) {
+            if (!currentLine.trim().startsWith("CS")) {
               // No longer parsing edges, fall back to node parsing
               break;
+            }
+            if (currentLine.contains("external")) {
+              // Don't care about external nodes
+              continue;
             }
             // Line is now a "CS" line, find the callee name and add it to the call graph
             String callee = currentLine.split("'")[1];

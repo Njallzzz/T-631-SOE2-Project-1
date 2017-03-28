@@ -23,8 +23,6 @@ class Program {
       T_CONFIDENCE = Integer.parseInt(args[2]);
     }
 
-    long startTime = System.currentTimeMillis();
-
     CallGraph callGraph = Parser.parse(filename);
     BugDetector detector = new BugDetector(callGraph);
     detector.scan(T_SUPPORT, T_CONFIDENCE);
