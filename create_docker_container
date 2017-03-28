@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker create -it -v $(pwd):/home/klee/project1 marvinlwenzel/soe2-kleeplus bash
