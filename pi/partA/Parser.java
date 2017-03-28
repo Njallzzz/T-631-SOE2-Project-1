@@ -1,4 +1,4 @@
-// To generate callgraph: opt-3.3 -print-callgraph <.bc file here> 2>&1 1> /dev/null
+// To generate callgraph: opt -print-callgraph <.bc file here> 2>&1 1> /dev/null
 import java.io.*;
 
 class Parser {

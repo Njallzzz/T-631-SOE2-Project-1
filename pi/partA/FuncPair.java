@@ -21,6 +21,14 @@ class FuncPair {
     }
   }
 
+  public String get(Integer i) {
+    if (i % 2 == 0) {
+      return first;
+    } else {
+      return second;
+    }
+  }
+
   public Boolean contains(String func) {
     return first.equals(func) || second.equals(func);
   }
@@ -55,8 +63,9 @@ class FuncPair {
     map.put(pair2, pair2.hashCode());
     map.put(pair3, pair3.hashCode());
 
-    for (Map.Entry<FuncPair, Integer> entry : map.entrySet()) {
-			System.out.println(entry.getKey() + ": " + entry.getValue());
-		}
+    System.out.println(pair1.get(0));
+    System.out.println(pair1.get(1));
+    System.out.println(pair1.get(2));
+    System.out.println(pair1.get(3));
   }
 }

@@ -12,24 +12,29 @@ import java.lang.StringBuilder;
 // Caller: A node that has an edge pointing away from it toward a callee
 // Callee: A node that has an edge pointing into it from a caller
 class CallGraph {
-  Map<String, Map<String, Boolean>> graph;
+  Map<String, Map<String, Integer>> graph;
   Set<String> nodes;
 
   public CallGraph() {
-    graph = new HashMap<String, Map<String, Boolean>>();
+    graph = new HashMap<String, Map<String, Integer>>();
     nodes = new HashSet<String>();
   }
 
   // Adds an edge between caller and callee, creating the nodes if they don't exist
   public void addEdge(String caller, String callee) {
     if (!graph.containsKey(caller)) {
-      graph.put(caller, new HashMap<String, Boolean>());
+      graph.put(caller, new HashMap<String, Integer>());
       nodes.add(caller);
     }
 
-    Map<String, Boolean> calls = graph.get(caller);
+    Map<String, Integer> callees = graph.get(caller);
 
-    calls.put(callee, true);
+    Integer weight = callees.get(callee);
+    if (weight == null) {
+      weight = 0;
+    }
+
+    callees.put(callee, weight+1);
     nodes.add(callee);
   }
 
@@ -39,13 +44,13 @@ class CallGraph {
       return false;
     }
 
-    Map<String, Boolean> callees = graph.get(node1);
+    Map<String, Integer> callees = graph.get(node1);
 
     if (!callees.containsKey(node2)) {
       return false;
     }
 
-    return callees.get(node2);
+    return callees.get(node2) > 0;
   }
 
   public Boolean hasNode(String node) {
@@ -67,16 +72,16 @@ class CallGraph {
   public Set<String> getCalleesFrom(String caller) {
     if (!graph.containsKey(caller)) return null;
 
-    Map<String, Boolean> callees = graph.get(caller);
+    Map<String, Integer> callees = graph.get(caller);
     return callees.keySet();
   }
 
   // Calculate how many times this pair of edges leaves the same node
-  public int edgePairs(String f1, String f2) {
+  public int edgePairs(String node1, String node2) {
     int result = 0;
-    for(Map.Entry<String, Map<String, Boolean>> entry : graph.entrySet()) {
-      Map<String, Boolean> callees = entry.getValue();
-      if (callees.containsKey(f1) && callees.containsKey(f2)) {
+    for(Map.Entry<String, Map<String, Integer>> entry : graph.entrySet()) {
+      Map<String, Integer> callees = entry.getValue();
+      if (callees.containsKey(node1) && callees.containsKey(node2)) {
         result++;
       }
     }
@@ -87,7 +92,7 @@ class CallGraph {
   public int edgesTo(String node) {
     int result = 0;
     for(String caller : graph.keySet()) {
-      Map<String, Boolean> callees = graph.get(caller);
+      Map<String, Integer> callees = graph.get(caller);
       if (callees.containsKey(node)) {
         result++;
       }
@@ -104,9 +109,9 @@ class CallGraph {
   public String toString() {
     StringBuilder builder = new StringBuilder();
 
-    for(Map.Entry<String, Map<String, Boolean>> entry : graph.entrySet()) {
+    for(Map.Entry<String, Map<String, Integer>> entry : graph.entrySet()) {
       builder.append(entry.getKey() + " -> ");
-      Map<String, Boolean> callees = entry.getValue();
+      Map<String, Integer> callees = entry.getValue();
       for (String callee : callees.keySet()) {
         builder.append(callee + ", ");
       }
