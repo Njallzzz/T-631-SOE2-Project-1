@@ -11,6 +11,7 @@ class Program {
     String filename;
     Integer T_SUPPORT = 3;
     Integer T_CONFIDENCE = 65;
+    Integer T_DEPTH = 0;
 
     if (args.length == 0) {
       System.out.println("Must supply arguments.");
@@ -21,10 +22,14 @@ class Program {
     if (args.length == 3) {
       T_SUPPORT = Integer.parseInt(args[1]);
       T_CONFIDENCE = Integer.parseInt(args[2]);
+    } else if(args.length == 4) {
+      T_SUPPORT = Integer.parseInt(args[1]);
+      T_CONFIDENCE = Integer.parseInt(args[2]);
+      T_DEPTH = Integer.parseInt(args[3]); 
     }
 
     CallGraph callGraph = Parser.parse(filename);
     BugDetector detector = new BugDetector(callGraph);
-    detector.scan(T_SUPPORT, T_CONFIDENCE);
+    detector.scan(T_SUPPORT, T_CONFIDENCE, T_DEPTH);
   }
 }
