@@ -70,7 +70,7 @@ class CallGraph {
 
   // Get a set of all nodes that caller has edges to
   public Set<String> getCalleesFrom(String caller) {
-    if (!graph.containsKey(caller)) return null;
+    if (!graph.containsKey(caller)) return new HashSet<String>();
 
     Map<String, Integer> callees = graph.get(caller);
     return callees.keySet();
@@ -98,6 +98,21 @@ class CallGraph {
       }
     }
     return result;
+  }
+
+  public Integer getTimesCalled(String caller, String callee) {
+    Map<String, Integer> callees = graph.get(caller);
+    if (callees == null) {
+      return 0;
+    }
+
+    Integer timesCalled = callees.get(callee);
+
+    if (timesCalled == null) {
+      return 0;
+    }
+
+    return timesCalled;
   }
 
   // Returns a set of the names of all nodes in the graph

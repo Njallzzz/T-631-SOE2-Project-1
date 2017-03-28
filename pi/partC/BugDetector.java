@@ -35,6 +35,8 @@ class BugDetector {
             // If the scope calls the first function but not the second, we can
             // assume that the bug lies in this scope
             if (callees.contains(pair.get(i)) && !callees.contains(pair.get(i+1))) {
+              BreadthFirstSearch bfs = new BreadthFirstSearch(graph, scope, pair.get(i+1), pair.get(i));
+              if (bfs.bfs(0) != null) continue; // We found the match for the variable, not a bug
               String output = String.format(
                 OUTPUT_FORMAT,
                 pair.get(i),
