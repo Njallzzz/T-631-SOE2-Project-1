@@ -64,42 +64,4 @@ class BreadthFirstSearch {
     }
     return null;
   }
-
-  public static void main(String[] args) {
-    CallGraph graph = new CallGraph();
-
-    /*
-      Function scope1 calls functions A, B, C, D
-      Function scope2 calls functions A, C, D
-      Function scope3 calls functions A, B
-      Function scope4 calls functions B, D, scope1,
-      Function scope5 calls functions A, B, D
-      Function scope6 calls functions B, D
-    */
-    graph.addEdge("scope1", "A");
-    graph.addEdge("scope1", "B");
-    graph.addEdge("scope1", "C");
-    graph.addEdge("scope1", "D");
-
-    graph.addEdge("scope2", "A");
-    graph.addEdge("scope2", "C");
-    graph.addEdge("scope2", "D");
-
-    graph.addEdge("scope3", "A");
-    graph.addEdge("scope3", "B");
-    graph.addEdge("scope3", "B");
-    graph.addEdge("scope3", "B");
-    graph.addEdge("scope3", "B");
-
-    graph.addEdge("scope4", "B");
-    graph.addEdge("scope4", "D");
-    graph.addEdge("scope4", "scope1");
-
-    graph.addEdge("scope5", "A");
-    graph.addEdge("scope5", "B");
-    graph.addEdge("scope5", "D");
-
-    graph.addEdge("scope6", "B");
-    graph.addEdge("scope6", "D");
-  }
 }
