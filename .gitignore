@@ -12,7 +12,6 @@
 # Oracle folder (wtf)
 .oracle_jre_usage
 
-pipair
 *.bc
 .bash_history
 proj-skeleton/test1/test1
