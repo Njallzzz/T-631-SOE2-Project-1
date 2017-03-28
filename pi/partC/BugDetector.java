@@ -8,7 +8,7 @@ class BugDetector {
   private CallGraph graph;
   private Map<String, Integer> functionSupport;
   private Map<FuncPair, Integer> pairSupport;
-  private String OUTPUT_FORMAT = "bug: %s in %s, pair: (%s, %s), support: %d, confidence: %.2f%%\r\n";
+  private String OUTPUT_FORMAT = "bug: %s in %s, pair: (%s, %s), support: %d, confidence: %.2f%%\n";
 
   public BugDetector(CallGraph graph) {
     this.graph = graph;
