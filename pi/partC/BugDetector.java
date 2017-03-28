@@ -8,7 +8,7 @@ class BugDetector {
   private CallGraph graph;
   private Map<String, Integer> functionSupport;
   private Map<FuncPair, Integer> pairSupport;
-  private String OUTPUT_FORMAT = "bug: %s in %s, pair: (%s, %s), support: %d, confidence: %.2f%%\n";
+  private String OUTPUT_FORMAT = "bug: %s in %s, pair: (%s, %s), support: %d, confidence: %.2f%%\r\n";
 
   public BugDetector(CallGraph graph) {
     this.graph = graph;
@@ -22,52 +22,80 @@ class BugDetector {
       int pSup = pairSupport.get(pair);
       if (pSup < support) continue; // Ignore pairs that are under the support threshold
 
-      // Calculate the confidence for each variable in the pair
-      double confidenceFirst = pSup * 100 / (double)functionSupport.get(pair.first);
-      double confidenceSecond = pSup * 100 / (double)functionSupport.get(pair.second);
+      // Iterate each variable in the pair
+      for (int i = 0; i < 2; i++) {
+        // Calculate the confidence for each variable in the pair
+        double conf = pSup * 100 / (double)functionSupport.get(pair.get(i));
 
-      if (confidenceFirst >= confidence) {
-        // Check all scopes for the reported variable
-        Set<String> scopes = graph.getCallersTo(pair.first);
-        for (String scope : scopes) {
-          Set<String> callees = graph.getCalleesFrom(scope);
-          // If the scope calls the first function but not the second, we can
-          // assume that the bug lies in this scope
-          if (callees.contains(pair.first) && !callees.contains(pair.second)) {
-            String output = String.format(
-              OUTPUT_FORMAT,
-              pair.first,
-              scope,
-              pair.first,
-              pair.second,
-              pSup,
-              confidenceFirst
-            );
+        if (conf >= confidence) {
+          // Check all scopes for the reported variable
+          Set<String> scopes = graph.getCallersTo(pair.get(i));
+          for (String scope : scopes) {
+            Set<String> callees = graph.getCalleesFrom(scope);
+            // If the scope calls the first function but not the second, we can
+            // assume that the bug lies in this scope
+            if (callees.contains(pair.get(i)) && !callees.contains(pair.get(i+1))) {
+              String output = String.format(
+                OUTPUT_FORMAT,
+                pair.get(i),
+                scope,
+                pair.first,
+                pair.second,
+                pSup,
+                conf
+              );
 
-            System.out.print(output);
+              System.out.print(output);
+            }
           }
         }
       }
 
-      if (confidenceSecond >= confidence) {
-        Set<String> scopes = graph.getCallersTo(pair.second);
-        for (String scope : scopes) {
-          Set<String> callees = graph.getCalleesFrom(scope);
-          if (!callees.contains(pair.first) && callees.contains(pair.second)){
-            String output = String.format(
-              OUTPUT_FORMAT,
-              pair.second,
-              scope,
-              pair.first,
-              pair.second,
-              pSup,
-              confidenceSecond
-            );
-
-            System.out.print(output);
-          }
-        }
-      }
+      // double confidenceFirst = pSup * 100 / (double)functionSupport.get(pair.first);
+      // double confidenceSecond = pSup * 100 / (double)functionSupport.get(pair.second);
+      //
+      // if (confidenceFirst >= confidence) {
+      //   // Check all scopes for the reported variable
+      //   Set<String> scopes = graph.getCallersTo(pair.first);
+      //   for (String scope : scopes) {
+      //     Set<String> callees = graph.getCalleesFrom(scope);
+      //     // If the scope calls the first function but not the second, we can
+      //     // assume that the bug lies in this scope
+      //     if (callees.contains(pair.first) && !callees.contains(pair.second)) {
+      //       String output = String.format(
+      //         OUTPUT_FORMAT,
+      //         pair.first,
+      //         scope,
+      //         pair.first,
+      //         pair.second,
+      //         pSup,
+      //         confidenceFirst
+      //       );
+      //
+      //       System.out.print(output);
+      //     }
+      //   }
+      // }
+      //
+      // if (confidenceSecond >= confidence) {
+      //   Set<String> scopes = graph.getCallersTo(pair.second);
+      //   for (String scope : scopes) {
+      //     Set<String> callees = graph.getCalleesFrom(scope);
+      //     if (!callees.contains(pair.first) && callees.contains(pair.second)){
+      //       String output = String.format(
+      //         OUTPUT_FORMAT,
+      //         pair.second,
+      //         scope,
+      //         pair.first,
+      //         pair.second,
+      //         pSup,
+      //         confidenceSecond
+      //       );
+      //
+      //       System.out.print(output);
+      //     }
+      //   }
+      // }
     }
 
     functionSupport = null;

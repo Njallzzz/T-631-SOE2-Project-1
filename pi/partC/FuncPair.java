@@ -1,5 +1,6 @@
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
 
 class FuncPair {
   public final String first;
@@ -18,6 +19,14 @@ class FuncPair {
     } else {
       this.first = second;
       this.second = first;
+    }
+  }
+
+  public String get(Integer i) {
+    if (i % 2 == 0) {
+      return first;
+    } else {
+      return second;
     }
   }
 
@@ -55,8 +64,9 @@ class FuncPair {
     map.put(pair2, pair2.hashCode());
     map.put(pair3, pair3.hashCode());
 
-    for (Map.Entry<FuncPair, Integer> entry : map.entrySet()) {
-			System.out.println(entry.getKey() + ": " + entry.getValue());
-		}
+    System.out.println(pair1.get(0));
+    System.out.println(pair1.get(1));
+    System.out.println(pair1.get(2));
+    System.out.println(pair1.get(3));
   }
 }
