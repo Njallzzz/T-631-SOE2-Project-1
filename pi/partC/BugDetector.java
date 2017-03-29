@@ -26,8 +26,7 @@ class BugDetector {
       for (int i = 0; i < 2; i++) {
         // Calculate the confidence for each variable in the pair
         double conf = pSup * 100 / (double)functionSupport.get(pair.get(i));
-
-        if (conf >= confidence) {
+        if (conf < 100 && conf >= confidence) {
           // Check all scopes for the reported variable
           Set<String> scopes = graph.getCallersTo(pair.get(i));
           for (String scope : scopes) {
