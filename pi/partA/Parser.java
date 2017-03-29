@@ -8,7 +8,8 @@ class Parser {
   public static CallGraph parse(String filepath) {
     CallGraph callGraph = new CallGraph();
 
-    try (BufferedReader br = new BufferedReader(new FileReader(filepath))) {
+    InputStreamReader instream = new InputStreamReader(System.in);
+    try (BufferedReader br = new BufferedReader(instream)) {
       String currentLine;
       while((currentLine = br.readLine()) != null) {
         if (currentLine.trim().startsWith("Call graph node for")) {
