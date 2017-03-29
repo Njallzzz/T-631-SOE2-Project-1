@@ -5,7 +5,7 @@ class Parser {
   private static CallGraph callGraph;
 
   // Parses a callgraph into a CallGraph class and returns it
-  public static CallGraph parse(String filepath) {
+  public static CallGraph parse() {
     CallGraph callGraph = new CallGraph();
 
     InputStreamReader instream = new InputStreamReader(System.in);
