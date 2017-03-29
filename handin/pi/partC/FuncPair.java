@@ -1,6 +1,5 @@
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Iterator;
 
 class FuncPair {
   public final String first;
